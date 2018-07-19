@@ -23,15 +23,32 @@
  * Licence : MIT
  * Copyright : www.projetsdiy.fr and www.diyprojects.io
 */
+#ifdef ESP8266
+  #include <ESP8266WiFi.h>       
+  #include <ESP8266WiFiMulti.h> 
+  #include <ESP8266WebServer.h>  
+  #include <ESP8266mDNS.h>
+#else
+  #include <WiFi.h>              
+  #include <WiFiMulti.h>        
+  #include <ESP32WebServer.h>    // https://github.com/Pedroalbuquerque/ESP32WebServer download and place in your Libraries folder
+  #include <ESPmDNS.h>
+#endif
+
 #include <WiFiClient.h>
-#include <ESP8266WebServer.h>
 #include <DHT.h>
 #include <Adafruit_BMP085.h>
 
 #define ssid      "yourSSID"      // WiFi SSID
 #define password  "yourPASSWORD"  // WiFi password
 #define DHTTYPE   DHT22           // DHT type (DHT11, DHT22)
-#define DHTPIN    D4              // Broche du DHT - DHT Pin
+#define DHTPIN    16              // Broche du DHT - DHT Pin
+
+#define D5 5  //becareful when choosing pin. these are chosen for ESP32. 
+#define D6 18
+#define D7 19
+#define D8 15
+
 const uint8_t GPIOPIN[4] = {D5,D6,D7,D8};  // Broches Led - Led Pins
 float   t = 0 ;
 float   h = 0 ;
@@ -42,7 +59,14 @@ String  theme = "bootstrap";
 // Création des objets - create Objects
 DHT dht(DHTPIN, DHTTYPE);
 Adafruit_BMP085 bmp;
-ESP8266WebServer server ( 80 );
+
+#ifdef ESP8266
+  ESP8266WiFiMulti wifiMulti; 
+  ESP8266WebServer server(80);
+#else
+  WiFiMulti wifiMulti;
+  ESP32WebServer server(80);
+#endif
 
 String getPage(){
   // Renvoi une chaine contenant le code HTML de la page - Return a string containing the HTML code of the page
